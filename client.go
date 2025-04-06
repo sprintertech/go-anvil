@@ -25,9 +25,9 @@ func New(opts ...Option) *Node {
 	}
 }
 
-// Run runs the anvil node
-// @TODO: should return available accounts on startup
-func (n *Node) Run() error {
+// Start starts the anvil node
+// @TODO: should return available accounts on startup or store them
+func (n *Node) Start() error {
 	defer n.running.Store(false)
 
 	if n.running.Load() {
@@ -36,12 +36,7 @@ func (n *Node) Run() error {
 
 	n.running.Store(true)
 
-	err := n.cmd.Run()
-	if err != nil {
-		return err
-	}
-
-	return n.cmd.Wait()
+	return n.cmd.Start()
 }
 
 // Stop stops the anvil node

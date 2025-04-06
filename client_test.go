@@ -21,7 +21,7 @@ func TestClient(t *testing.T) {
 
 	defer cli.Stop()
 
-	go cli.Run()
+	go cli.Start()
 
 	time.Sleep(1 * time.Second)
 
