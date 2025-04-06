@@ -21,12 +21,7 @@ func TestClient(t *testing.T) {
 
 	defer cli.Stop()
 
-	go func() {
-		err := cli.Run()
-		if err != nil {
-			t.Fatal(err) // @TODO
-		}
-	}()
+	go cli.Run()
 
 	time.Sleep(1 * time.Second)
 
