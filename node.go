@@ -87,6 +87,7 @@ func (n *Node) SetBalance(account common.Address, balance *big.Int) error {
 // Stop stops the anvil node
 func (n *Node) Stop() error {
 	n.running.Store(false)
+	n.cli.Close()
 	return n.cmd.Process.Kill()
 }
 
