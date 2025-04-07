@@ -7,6 +7,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/lmittmann/w3"
 	"github.com/sprintertech/go-anvil"
 )
@@ -15,7 +16,7 @@ func TestClient(t *testing.T) {
 	port := 8547
 	chainid := 13451
 
-	cli := anvil.New(
+	cli := anvil.NewNode(
 		anvil.WithPort(port),
 		anvil.WithChainID(chainid),
 	)
@@ -27,14 +28,17 @@ func TestClient(t *testing.T) {
 
 	defer cli.Stop()
 
-	ethcli, err := ethclient.Dial(fmt.Sprintf("http://127.0.0.1:%d", port))
+	rpccli, err := rpc.Dial(fmt.Sprintf("http://127.0.0.1:%d", port))
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	ethcli := ethclient.NewClient(rpccli)
+	acli := anvil.NewClient(rpccli)
+
 	addr := common.HexToAddress("0xc0de000000000000000000000000000000000000")
 	balance := w3.I("53 eth")
-	err = cli.SetBalance(addr, balance)
+	err = acli.SetBalance(addr, balance)
 	if err != nil {
 		t.Fatal(err)
 	}

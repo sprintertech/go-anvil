@@ -9,7 +9,6 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
@@ -20,8 +19,8 @@ type Node struct {
 	cmd     *exec.Cmd
 }
 
-// New creates a new Node configured with the passed options
-func New(opts ...Option) *Node {
+// NewNode creates a new Node configured with the passed options
+func NewNode(opts ...Option) *Node {
 	var args []string
 	for _, opt := range opts {
 		args = append(args, opt...)
@@ -78,11 +77,6 @@ func (n *Node) Start() error {
 	n.cli = cli
 
 	return nil
-}
-
-// SetBalance sets the balance of a given account.
-func (n *Node) SetBalance(account common.Address, balance *big.Int) error {
-	return n.cli.Call(nil, "anvil_setBalance", account, "0x"+balance.Text(16))
 }
 
 // Stop stops the anvil node
