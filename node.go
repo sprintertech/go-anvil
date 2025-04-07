@@ -1,14 +1,20 @@
 package anvil
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"math/big"
 	"os/exec"
 	"sync/atomic"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/rpc"
 )
 
 // Node represents an active Anvil client
 type Node struct {
+	cli     *rpc.Client
 	running atomic.Bool
 	cmd     *exec.Cmd
 }
@@ -36,7 +42,24 @@ func (n *Node) Start() error {
 
 	n.running.Store(true)
 
-	return n.cmd.Start()
+	output, err := n.cmd.StdoutPipe()
+	if err != nil {
+		return err // @TODO return specific error
+	}
+
+	scanner := bufio.NewScanner(output)
+
+	err = n.cmd.Start()
+	if err != nil {
+		return err
+	}
+
+	scanner.Scan()
+	return nil
+}
+
+func (n *Node) SetBalance(account common.Address, balance *big.Int) error {
+	return n.cli.Call(nil, "anvil_setBalance", account, balance)
 }
 
 // Stop stops the anvil node
@@ -58,8 +81,8 @@ func WithBlockTime(seconds int) Option {
 // WithBalance sets the initial balance of accounts.
 //
 // Equivalent to the `--balance <BALANCE>` flag
-func WithBalance(balance int) Option {
-	return []string{"--balance", fmt.Sprintf("%d", balance)}
+func WithBalance(balance *big.Int) Option {
+	return []string{"--balance", fmt.Sprintf("%s", balance)}
 }
 
 // WithDerivationPath sets the derivation path for HD wallets.
@@ -173,8 +196,8 @@ func WithForkURL(url string) Option {
 // WithForkBlockNumber forks from a specific block number.
 //
 // Equivalent to the `--fork-block-number <BLOCK>` flag
-func WithForkBlockNumber(block int) Option {
-	return []string{"--fork-block-number", fmt.Sprintf("%d", block)}
+func WithForkBlockNumber(block *big.Int) Option {
+	return []string{"--fork-block-number", fmt.Sprintf("%s", block)}
 }
 
 // WithForkRetryBackoff sets initial retry backoff on fork errors.

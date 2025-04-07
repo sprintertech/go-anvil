@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"testing"
-	"time"
 
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/sprintertech/go-anvil"
@@ -19,11 +18,12 @@ func TestClient(t *testing.T) {
 		anvil.WithChainID(chainid),
 	)
 
+	err := cli.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	defer cli.Stop()
-
-	go cli.Start()
-
-	time.Sleep(1 * time.Second)
 
 	ethcli, err := ethclient.Dial(fmt.Sprintf("http://127.0.0.1:%d", port))
 	if err != nil {
