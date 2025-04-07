@@ -8,6 +8,20 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 )
 
+type NodeInfo struct {
+	AvailableAccounts []string `json:"available_accounts"`
+	BaseFee           string   `json:"base_fee"`
+	GasLimit          string   `json:"gas_limit"`
+	GasPrice          string   `json:"gas_price"`
+	PrivateKeys       []string `json:"private_keys"`
+	Wallet            Wallet   `json:"wallet"`
+}
+
+type Wallet struct {
+	DerivationPath string `json:"derivation_path"`
+	Mnemonic       string `json:"mnemonic"`
+}
+
 // Client is an RPC client for anvil specific functions
 type Client struct {
 	cli *rpc.Client
@@ -98,6 +112,9 @@ func (c *Client) Reset(forkURL string) error {
 	if forkURL == "" {
 		return c.cli.Call(nil, "anvil_reset")
 	}
+
+	// @TODO block number
+
 	config := map[string]interface{}{"forking": map[string]string{"jsonRpcUrl": forkURL}}
 	return c.cli.Call(nil, "anvil_reset", config)
 }
@@ -105,8 +122,14 @@ func (c *Client) Reset(forkURL string) error {
 // DumpState returns a hex-encoded snapshot of the entire chain state.
 //
 // Equivalent to the `anvil_dumpState` RPC call.
-func (c *Client) DumpState(out *string) error {
-	return c.cli.Call(out, "anvil_dumpState")
+func (c *Client) DumpState() ([]byte, error) {
+	var data []byte
+	err := c.cli.Call(data, "anvil_dumpState")
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 // LoadState merges a previously dumped state into the current chain state.
@@ -119,6 +142,12 @@ func (c *Client) LoadState(state string) error {
 // NodeInfo retrieves the current node configuration parameters.
 //
 // Equivalent to the `anvil_nodeInfo` RPC call.
-func (c *Client) NodeInfo(info *map[string]interface{}) error {
-	return c.cli.Call(info, "anvil_nodeInfo")
+func (c *Client) NodeInfo() (*NodeInfo, error) {
+	info := &NodeInfo{}
+	err := c.cli.Call(info, "anvil_nodeInfo")
+	if err != nil {
+		return nil, err
+	}
+
+	return info, nil
 }
