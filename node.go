@@ -80,6 +80,7 @@ func (n *Node) Start() error {
 	return nil
 }
 
+// SetBalance sets the balance of a given account.
 func (n *Node) SetBalance(account common.Address, balance *big.Int) error {
 	return n.cli.Call(nil, "anvil_setBalance", account, "0x"+balance.Text(16))
 }
