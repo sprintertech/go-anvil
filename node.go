@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/big"
 	"os/exec"
+	"strings"
 	"sync/atomic"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -54,12 +55,33 @@ func (n *Node) Start() error {
 		return err
 	}
 
-	scanner.Scan()
+	addr := ""
+	for scanner.Scan() {
+		text := scanner.Text()
+		if !strings.HasPrefix(text, "Listening on") {
+			continue
+		}
+
+		addr = strings.TrimPrefix(text, "Listening on ")
+		break
+	}
+
+	if addr == "" {
+		return errors.New("failed to start up")
+	}
+
+	cli, err := rpc.Dial("http://" + addr)
+	if err != nil {
+		return err
+	}
+
+	n.cli = cli
+
 	return nil
 }
 
 func (n *Node) SetBalance(account common.Address, balance *big.Int) error {
-	return n.cli.Call(nil, "anvil_setBalance", account, balance)
+	return n.cli.Call(nil, "anvil_setBalance", account, "0x"+balance.Text(16))
 }
 
 // Stop stops the anvil node
