@@ -108,14 +108,12 @@ func (c *Client) SetLoggingEnabled(enable bool) error {
 // Reset resets the node state to the original or a new forked state.
 //
 // Equivalent to the `anvil_reset` RPC call.
-func (c *Client) Reset(forkURL string) error {
+func (c *Client) Reset(forkURL string, block *big.Int) error {
 	if forkURL == "" {
 		return c.cli.Call(nil, "anvil_reset")
 	}
 
-	// @TODO block number
-
-	config := map[string]interface{}{"forking": map[string]string{"jsonRpcUrl": forkURL}}
+	config := map[string]interface{}{"forking": map[string]string{"jsonRpcUrl": forkURL, "blockNumber": block.String()}}
 	return c.cli.Call(nil, "anvil_reset", config)
 }
 
