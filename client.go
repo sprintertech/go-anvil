@@ -66,7 +66,7 @@ func (c *Client) SetCode(account common.Address, code []byte) error {
 // SetStorageAt writes a single storage slot at a given account.
 //
 // Equivalent to the `anvil_setStorageAt` RPC call.
-func (c *Client) SetStorageAt(account common.Address, slot string, value string) error {
+func (c *Client) SetStorageAt(account common.Address, slot common.Hash, value []byte) error {
 	return c.cli.Call(nil, "anvil_setStorageAt", account, slot, value)
 }
 
