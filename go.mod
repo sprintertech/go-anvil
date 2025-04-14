@@ -3,8 +3,8 @@ module github.com/sprintertech/go-anvil
 go 1.24.1
 
 require (
-	github.com/ethereum/go-ethereum v1.15.7
-	github.com/lmittmann/w3 v0.19.3
+	github.com/ethereum/go-ethereum v1.15.8
+	github.com/lmittmann/w3 v0.19.4
 )
 
 require (
